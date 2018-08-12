@@ -17,8 +17,13 @@ public class FloatLoan extends Loan {
 
 	public void addInterest() {
 		balance += InterestRate.getFloatRate() * (balance - offset);
-		offset -= InterestRate.getFloatRate() * offset;
 		term--;
+	}
+	
+	public void makePayment(Payment payment) {
+		balance -= payment.getAmount() + offset;
+		offset = 0;
+		lastPayment = payment;
 	}
 
 	public boolean hasOffsetAccount() {
