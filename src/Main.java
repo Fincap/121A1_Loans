@@ -1,4 +1,7 @@
+import com.sun.org.apache.bcel.internal.classfile.SourceFile;
+
 import java.util.GregorianCalendar;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -13,9 +16,11 @@ public class Main {
 			System.out.println("\n----------------\nCHOOSE AN OPTION\n----------------");
 			System.out.println("1. View all loans");
 			System.out.println("2. Open a new loan");
-			System.out.println("3. Manage offset accounts");
-			System.out.println("4. Manage floating interest rate");
-			System.out.println("5. Apply interest to all loans");
+			System.out.println("3. Make payment to loan");
+			System.out.println("4. Manage offset accounts");
+			System.out.println("5. Manage floating interest rate");
+			System.out.println("6. Apply interest to all loans");
+			System.out.println("7. Advanced options");
 			System.out.println("0. Exit program");
 
 			System.out.print("> ");
@@ -33,14 +38,18 @@ public class Main {
 					break;
 
 				case 3:
-					manageOffset();
+					makePayment();
 					break;
 
 				case 4:
-					manageInterest();
+					manageOffset();
 					break;
 
 				case 5:
+					manageInterest();
+					break;
+
+				case 6:
 					Loan.addInterestAll();
 					System.out.println("Applied interest to all loans!");
 					break;
@@ -55,6 +64,9 @@ public class Main {
 					break;
 			}
 		}
+	}
+
+	private static void makePayment() {
 	}
 
 	private static void openLoan() {
@@ -120,6 +132,57 @@ public class Main {
 	}
 
 	private static void manageOffset() {
+		System.out.println("1. Deposit into offset account\n2. Withdraw from offset account");
+		int choice = in.nextInt();
+		switch (choice) {
+			case 1:
+				// Print out all floating loans
+				for (Loan loan : Loan.allLoans) {
+					if (loan.hasOffsetAccount()) {
+						loan.print();
+					}
+				}
+
+				in.nextLine(); // Flush
+				System.out.print("Enter loan ID > ");
+				int selectedLoanID = in.nextInt();
+
+				in.nextLine();
+				System.out.print("Enter amount to deposit > ");
+				double depositAmount = in.nextDouble();
+
+				((FloatLoan) Loan.getLoan(selectedLoanID)).depositOffset(depositAmount); // Casts selected loan to FloatLoan, so that the depositOffset method may be used
+
+				System.out.printf("$%.2f deposited into account %d", depositAmount, selectedLoanID);
+
+				break;
+
+			case 2:
+				// Print out all floating loans
+				for (Loan loan : Loan.allLoans) {
+					if (loan.hasOffsetAccount()) {
+						loan.print();
+					}
+				}
+
+				in.nextLine(); // Flush
+				System.out.print("Enter loan ID > ");
+				selectedLoanID = in.nextInt();
+
+				in.nextLine();
+				System.out.print("Enter amount to withdraw > ");
+				double withdrawAmount = in.nextDouble();
+
+				((FloatLoan) Loan.getLoan(selectedLoanID)).withdrawOffset(withdrawAmount); // Casts selected loan to FloatLoan, so that the withdrawOffset method may be used
+
+				System.out.printf("$%.2f withdrawn from account %d", withdrawAmount, selectedLoanID);
+
+				break;
+
+			default:
+				System.out.println("Invalid option, returning to menu...");
+				break;
+		}
 	}
 
 	private static void manageInterest() {
@@ -161,7 +224,7 @@ public class Main {
 
 		System.out.println("\nAfter payment + offset");
 
-		new Payment(1, loan1.getLoanID(), 100, new GregorianCalendar(2018, 6, 10));
+		new Payment(loan1.getLoanID(), 100, new GregorianCalendar(2018, 6, 10));
 		loan2.depositOffset(100);
 
 		loan1.print();
@@ -175,7 +238,7 @@ public class Main {
 		loan2.print();
 
 		System.out.println("\nAfter paid off");
-		new Payment(2, loan1.getLoanID(), 1425, new GregorianCalendar());
+		new Payment(loan1.getLoanID(), 1425, new GregorianCalendar());
 
 		loan1.print();
 		loan2.print();

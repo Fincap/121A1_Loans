@@ -3,7 +3,7 @@ import java.util.GregorianCalendar;
 
 abstract class Loan {
 
-	public static ArrayList<Loan> allLoans = new ArrayList<>();
+	public static ArrayList<Loan> allLoans = new ArrayList<>(); // A static list containing all loans
 
 	protected int loanID;
 	protected String suburb;
@@ -16,16 +16,18 @@ abstract class Loan {
 		this.suburb = suburb;
 		this.balance = balance;
 		this.term = term;
-		this.lastPayment = new Payment(-1, this.loanID, 0, new GregorianCalendar(1970, 0, 1)); // New GregorianCalendar object with Jan 1st 1970 as default. ID less than 0 indicates a "default" lastPayment
+		this.lastPayment = new Payment(this.loanID); // Creates payment using the Payment "default" constructor that only takes a loanID.
 
-		allLoans.add(this);
+		allLoans.add(this); // Upon creation, a loan is added to the static list of all loans
 	}
 
+	// Processes a new payment to the loan
 	public void makePayment(Payment payment) {
 		balance -= payment.getAmount();
 		lastPayment = payment;
 	}
 
+	// Abstract method that all children must have a version of
 	public abstract void addInterest();
 
 	public static void addInterestAll() {
@@ -42,12 +44,25 @@ abstract class Loan {
 		return balance;
 	}
 
+	public Payment getLastPayment() {
+		return lastPayment;
+	}
+
+	// Method used to determine if loan has an offset account
 	public boolean hasOffsetAccount() {
 		return false;
 	}
 
 	public boolean isPaidOff() {
 		return balance <= 0;
+	}
+
+	// Returns the loan that has an ID matching the parameter. Returns null if not found
+	public static Loan getLoan(int loanID) {
+		for (Loan loan : allLoans) {
+			if (loan.getLoanID() == loanID) return loan;
+		}
+		return null;
 	}
 
 	public abstract void print();

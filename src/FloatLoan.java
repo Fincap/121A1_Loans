@@ -19,7 +19,8 @@ public class FloatLoan extends Loan {
 		balance += InterestRate.getFloatRate() * (balance - offset);
 		term--;
 	}
-	
+
+	// Makes a payment to the loan, and adding the offset amount to the payment
 	public void makePayment(Payment payment) {
 		balance -= payment.getAmount() + offset;
 		offset = 0;
